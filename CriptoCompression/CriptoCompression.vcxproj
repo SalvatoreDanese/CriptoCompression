@@ -139,10 +139,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Compressore.cpp" />
     <ClCompile Include="CriptoCompression.cpp" />
+    <ClCompile Include="Decompressore.cpp" />
     <ClCompile Include="hkdf.cpp" />
     <ClCompile Include="rsaTest.cpp" />
     <ClCompile Include="signature.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Compressore.h" />
+    <ClInclude Include="Decompressore.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

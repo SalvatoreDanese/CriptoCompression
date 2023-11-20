@@ -27,5 +27,19 @@
     <ClCompile Include="signature.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Compressore.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Decompressore.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Compressore.h">
+      <Filter>File di origine</Filter>
+    </ClInclude>
+    <ClInclude Include="Decompressore.h">
+      <Filter>File di origine</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

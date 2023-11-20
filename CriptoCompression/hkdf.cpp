@@ -14,7 +14,7 @@ void DeriveKeyWithHKDF(const byte* salt, size_t saltLength,
     hkdf.DeriveKey(derivedKey, derivedKeyLength, ikm, ikmLength, salt, saltLength, info, infoLength);
 }
 
-int main() {
+int funzione2() {
     // Definizione dei parametri per la derivazione di chiavi
     byte salt[] = { 0x00, 0x01, 0x02, 0x03 }; // Salt (puoi generare casualmente) HASH DELLE COSE CHE DOBBIAMO FA
     byte ikm[] = "Input Key Material"; // Input Key Material 

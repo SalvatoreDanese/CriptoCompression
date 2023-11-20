@@ -11,9 +11,10 @@
 using namespace CryptoPP;
 
 // Funzione di callback per notificare l'uso della chiave
-void NotifyKeyUsage(const std::string& keyType, const std::string& action) {
+void NotifyKeyUsage2(const std::string& keyType, const std::string& action) {
     std::cout << "Key " << keyType << " used for " << action << std::endl;
 }
+
 
 // Funzione per firmare un messaggio
 std::string SignMessage(const std::string& message, const RSA::PrivateKey& privateKey) {
@@ -25,7 +26,7 @@ std::string SignMessage(const std::string& message, const RSA::PrivateKey& priva
     StringSource(message, true, new SignerFilter(rng, signer, new StringSink(signature)));
 
     // Notifica l'uso della chiave privata per la firma
-    NotifyKeyUsage("Private", "signing");
+    NotifyKeyUsage2("Private", "signing");
 
     return signature;
 }
@@ -39,12 +40,12 @@ bool VerifySignature(const std::string& message, const std::string& signature, c
     StringSource(signature + message, true, new SignatureVerificationFilter(verifier, new ArraySink((byte*)&result, sizeof(result))));
 
     // Notifica l'uso della chiave pubblica per la verifica
-    NotifyKeyUsage("Public", "verification");
+    NotifyKeyUsage2("Public", "verification");
 
     return result;
 }
 
-int main() {
+int funzione1() {
     // Generazione delle chiavi RSA
     AutoSeededRandomPool rng;
     InvertibleRSAFunction params;
@@ -54,8 +55,8 @@ int main() {
     RSA::PublicKey publicKey(privateKey);
 
     // Notifica l'uso delle chiavi
-    NotifyKeyUsage("Private", "generation");
-    NotifyKeyUsage("Public", "generation");
+    NotifyKeyUsage2("Private", "generation");
+    NotifyKeyUsage2("Public", "generation");
 
     // Messaggio da firmare
     std::string originalMessage = "Hello, Digital Signature!";
