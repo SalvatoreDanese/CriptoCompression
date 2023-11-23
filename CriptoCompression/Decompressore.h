@@ -25,6 +25,8 @@ public:
     void setChannel(std::queue<std::string> ch);
     RSA::PublicKey getPublicKey();
     RSA::PrivateKey getPrivateKey();
+    std::string checkIndexesString();
+    void createSharedKey(std::string);
 
 
 private:
@@ -32,7 +34,7 @@ private:
     std::string shared_info[5];
     InvertibleRSAFunction params;
     std::queue<std::string> channel;
-    byte* sharedkey;
+    byte sharedkey[32];
     int a;
 };
 

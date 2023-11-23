@@ -6,7 +6,7 @@
 
 using namespace CryptoPP;
 
-void DeriveKeyWithHKDF(const byte* salt, size_t saltLength,
+void DeriveKeyWithHKDF2(const byte* salt, size_t saltLength,
     const byte* ikm, size_t ikmLength,
     const byte* info, size_t infoLength,
     byte* derivedKey, size_t derivedKeyLength) {
@@ -28,7 +28,7 @@ int funzione2() {
     byte derivedKey[derivedKeyLength];
 
     // Esecuzione della derivazione di chiavi con HKDF
-    DeriveKeyWithHKDF(salt, saltLength, ikm, ikmLength, info, infoLength, derivedKey, derivedKeyLength);
+    DeriveKeyWithHKDF2(salt, saltLength, ikm, ikmLength, info, infoLength, derivedKey, derivedKeyLength);
 
     // Stampa della chiave derivata
     std::cout << "Derived Key: ";

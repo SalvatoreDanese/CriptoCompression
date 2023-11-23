@@ -13,14 +13,3 @@
 #include <string>
 #include <queue>
 
-
-
-int main() {
-	Compressore Alice; 
-	Decompressore Bob;
-	std::queue<int> myQueue;
-	
-
-
-	return 0;
-}

@@ -7,6 +7,8 @@
 #include <cryptopp/rsa.h>
 #include <cryptopp/osrng.h>
 #include <queue>
+#include <vector>
+
 
 using namespace CryptoPP;
 
@@ -25,13 +27,20 @@ public:
     void setChannel(std::queue<std:: string> ch);
     RSA::PublicKey getPublicKey();
     RSA::PrivateKey getPrivateKey();
+    std::string checkIndexesString();
+    std::vector<int> indexesInCommon(std::string);
+    std::string permutation(std::vector<int>);
+    void createSharedKey(std::string);
+    std::vector<int> tokenizeByComma(std::string);
+    byte* convertToByte(std::string);
+    byte* getSharedKey();
 
 private:
     // Attributi privati della classe
     std::string shared_info[5];
     InvertibleRSAFunction params;
     std::queue<std::string> channel;
-    byte* sharedkey;
+    byte sharedKey[32];
 };
 
 #endif  // MYCLASS_H
