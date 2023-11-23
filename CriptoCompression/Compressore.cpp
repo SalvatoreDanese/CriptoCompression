@@ -31,3 +31,13 @@ std:: string Compressore::receive(std::string value) {
 void Compressore::setChannel(std::queue<std::string> ch) {
     channel = ch;
 }
+
+RSA::PublicKey Compressore::getPublicKey() {
+    return RSA::PublicKey(params);
+
+}
+
+RSA::PrivateKey Compressore::getPrivateKey() {
+    return RSA::PrivateKey(params);
+
+}

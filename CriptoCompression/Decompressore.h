@@ -23,6 +23,10 @@ public:
     void send(std::string a);
     std::string receive();
     void setChannel(std::queue<std::string> ch);
+    RSA::PublicKey getPublicKey();
+    RSA::PrivateKey getPrivateKey();
+
+
 private:
     // Attributi privati della classe
     std::string shared_info[5];

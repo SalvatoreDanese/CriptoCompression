@@ -31,3 +31,12 @@ void Decompressore::setChannel(std::queue<std::string> ch) {
     channel = ch;
 }
 
+RSA::PublicKey Decompressore::getPublicKey() {
+    return RSA::PublicKey(params);
+
+}
+
+RSA::PrivateKey Decompressore::getPrivateKey() {
+    return RSA::PrivateKey(params);
+
+}
