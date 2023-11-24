@@ -31,7 +31,7 @@ public:
     std::string decryptMessageRSA(std::string);
     std::string signMessageRSA(const std::string&);
     bool verifySignatureRSA(const std::string& , const std::string& , const RSA::PublicKey&);
-
+    std::string calculateHash(std::string&);
 
 private:
     // Attributi privati della classe

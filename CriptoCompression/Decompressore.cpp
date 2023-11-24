@@ -11,6 +11,7 @@
 #include <cryptopp/hkdf.h>
 #include <cryptopp/sha.h>
 #include <cryptopp/secblock.h>
+#include "cryptopp/hex.h"
 
 // Implementazione del costruttore
 Decompressore::Decompressore() {
@@ -120,6 +121,15 @@ std::vector<int> Decompressore::tokenizeByComma(std::string receivedInfo) {
     return common;
 }
 
+std::string Decompressore::calculateHash(std::string& input) {
+    SHA256 hash;
+    std::string hashStr;
+
+    StringSource(input, true, new HashFilter(hash, new HexEncoder(new StringSink(hashStr))));
+    return hashStr;
+
+}
+
 
 void Decompressore::createSharedKey(std::string permutation) {
     std::vector<int> indexes = tokenizeByComma(permutation);
@@ -128,6 +138,7 @@ void Decompressore::createSharedKey(std::string permutation) {
         concatenation = concatenation + sharedInfo[indexes[i]];
     }
 
+    concatenation = calculateHash(concatenation);
     const byte* ikm = reinterpret_cast<const byte*>(concatenation.data());
     const size_t ikmLength = sizeof(ikm) - 1; // -1 per escludere il terminatore null
     hkdf.DeriveKey(sharedKey, derivedKeyLength, ikm, ikmLength, salt, saltLength, info, infoLength);

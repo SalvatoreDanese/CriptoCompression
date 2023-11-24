@@ -15,6 +15,9 @@
 
 
 
+void printMessage(std::string message, std::string sender) {
+	std::cout << "[" << sender << "] " << message << std::endl << std::endl;
+}
 
 
 int main() {
@@ -25,19 +28,22 @@ int main() {
 	compressor.setChannel(channel);
 	decompressor.setChannel(channel);
 
+	std::cout << "**************************" << std::endl << "CHANNEL TRANSCRIPT: " << std::endl << std::endl;
+
 
 	std::string decompressorIndexes = decompressor.checkIndexesString();
 	std::string encryptedDecompressorIndexes = decompressor.encryptMessageRSA(decompressorIndexes, compressor.getPublicKey());
 	
-
-	std::cout << "Decompressor indexes: " << decompressorIndexes << std::endl;
 
 	std::string decompressorIndexesSignature = decompressor.signMessageRSA(encryptedDecompressorIndexes);
 
 	channel.push(encryptedDecompressorIndexes);
 	channel.push(decompressorIndexesSignature);
 
-	std::cout << "SIGNATURE decompressor indexes: " << decompressorIndexesSignature << std::endl;
+	printMessage("ENCRYPTED DECOMPRESSOR INDEXES:\n" +encryptedDecompressorIndexes, "DECOMPRESSOR");
+	printMessage("ENCRYPTED DECOMPRESSOR INDEXES SIGNATURE:\n" + decompressorIndexesSignature, "DECOMPRESSOR");
+
+	
 
 	
 	std::string encryptedIndexesByDecompressor = channel.front();
@@ -57,28 +63,18 @@ int main() {
 
 	std::vector<int> commonIndexes = compressor.indexesInCommon(decryptedDecompressorIndexes);
 
-
-	std::cout << "Common indexes: ";
-
-	for (int i = 0; i < commonIndexes.size(); i++) {
-		std::cout << commonIndexes[i] << ",";
-	}
-	std::cout << std::endl;
-
-
 	std::string choosenPermutation = compressor.createPermutation(commonIndexes);
-	std::cout <<"Choosen permutation: " << choosenPermutation << std::endl;
 
 	std::string encryptedChoosenPermutation = compressor.encryptMessageRSA(choosenPermutation, decompressor.getPublicKey());
-
-	std::cout << "Encrypted choosen permutation: " << encryptedChoosenPermutation << std::endl;
-
 
 	channel.push(encryptedChoosenPermutation);
 
 	std::string encryptedChoosenPermutationSignature = compressor.signMessageRSA(encryptedChoosenPermutation);
 	channel.push(encryptedChoosenPermutationSignature);
 
+	printMessage("ENCRYPTED CHOOSEN PERMUTATION INDEXES:\n" + encryptedChoosenPermutation, "COMPRESSOR");
+	printMessage("ENCRYPTED CHOOSEN PERMUTATION INDEXES SIGNATURE:\n" + encryptedChoosenPermutationSignature, "COMPRESSOR");
+	std::cout << std::endl << "END CHANNEL TRANSCRIPT: " << std::endl << "**************************"  <<  std::endl;
 
 	std::string encryptedChoosenPermutationByCompressor = channel.front();
 	channel.pop();
@@ -94,15 +90,26 @@ int main() {
 
 	std::string decryptedChoosenPermutation = decompressor.decryptMessageRSA(encryptedChoosenPermutationByCompressor);
 
-	
-
-	std::cout << "Decrypted choosen permutation: " << decryptedChoosenPermutation << std::endl;
-
 	compressor.createSharedKey(choosenPermutation);
 	decompressor.createSharedKey(decryptedChoosenPermutation);
 
 	byte* compressorSymKey = compressor.getSharedKey();
 	byte* decompressorSymKey = decompressor.getSharedKey();
+
+
+	std::cout << std::endl << "**************************" << std::endl << "PLAINTEXT DATA FLOW: " << std::endl << std::endl;
+
+	
+	printMessage("Decompressor indexes: " + decompressorIndexes, "DECOMPRESSOR");
+
+	std::cout << "COMMON INDEXES: ";
+	for (int i = 0; i < commonIndexes.size(); i++) {
+		std::cout << commonIndexes[i] << ",";
+	}
+	std::cout << std::endl << std::endl;
+
+	printMessage("Choosen permutation:\n" + choosenPermutation, "COMPRESSOR");
+	printMessage("Decrypted choosen permutation: " + decryptedChoosenPermutation, "DECOMPRESSOR");
 
 	std::cout << "[COMPRESSOR] Derived Key: ";
 	for (size_t i = 0; i < DERIVED_KEY_LENGTH; ++i) {
@@ -121,3 +128,4 @@ int main() {
 	return 0;
 
 }
+
