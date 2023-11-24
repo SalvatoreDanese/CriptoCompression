@@ -18,7 +18,6 @@ Compressore::Compressore() {
     // Inizializzazione degli attributi
     // Generazione delle chiavi RSA
 
-    AutoSeededRandomPool rng;
     params.GenerateRandomWithKeySize(rng, 2048);
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);

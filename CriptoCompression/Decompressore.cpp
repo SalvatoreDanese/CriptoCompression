@@ -16,7 +16,6 @@
 Decompressore::Decompressore() {
     // Inizializzazione degli attributi, se necessario
         // Generazione delle chiavi RSA
-    AutoSeededRandomPool rng;
     params.GenerateRandomWithKeySize(rng, 2048);
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);

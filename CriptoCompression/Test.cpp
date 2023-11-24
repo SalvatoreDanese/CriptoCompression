@@ -79,8 +79,6 @@ int main() {
 	std::string encryptedChoosenPermutationSignature = compressor.signMessageRSA(encryptedChoosenPermutation);
 	channel.push(encryptedChoosenPermutationSignature);
 
-	compressor.createSharedKey(choosenPermutation);
-	decompressor.createSharedKey(choosenPermutation);
 
 	std::string encryptedChoosenPermutationByCompressor = channel.front();
 	channel.pop();
@@ -99,6 +97,9 @@ int main() {
 	
 
 	std::cout << "Decrypted choosen permutation: " << decryptedChoosenPermutation << std::endl;
+
+	compressor.createSharedKey(choosenPermutation);
+	decompressor.createSharedKey(decryptedChoosenPermutation);
 
 	byte* compressorSymKey = compressor.getSharedKey();
 	byte* decompressorSymKey = decompressor.getSharedKey();
