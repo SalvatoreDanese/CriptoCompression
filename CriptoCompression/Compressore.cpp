@@ -15,30 +15,21 @@ using namespace CryptoPP;
 
 // Implementazione del costruttore
 Compressore::Compressore() {
-    // Inizializzazione degli attributi, se necessario
-        // Generazione delle chiavi RSA
+    // Inizializzazione degli attributi
+    // Generazione delle chiavi RSA
+
     AutoSeededRandomPool rng;
     params.GenerateRandomWithKeySize(rng, 2048);
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);
-    shared_info[0] = "ciao";
-    shared_info[3] = "ok";
+    sharedInfo[0] = "ciao";
+    sharedInfo[3] = "ok";
 
 }
 
 // Implementazione del distruttore
 Compressore::~Compressore() {
     // Eventuale rilascio di risorse allocate
-}
-
-// Implementazione del metodo setMyInt
-void Compressore::send(std:: string value) {
-    
-}
-
-// Implementazione del metodo getMyInt
-std:: string Compressore::receive(std::string value) {
-    return NULL;
 }
 
 void Compressore::setChannel(std::queue<std::string> ch) {
@@ -55,11 +46,58 @@ RSA::PrivateKey Compressore::getPrivateKey() {
 
 }
 
+byte* Compressore::getSharedKey() {
+    return sharedKey;
+}
+
+std::string Compressore::encryptMessageRSA(std::string message, RSA::PublicKey destinationPKey) {
+    std::string encrypted;
+    RSAES_OAEP_SHA_Encryptor encryptor(destinationPKey);
+
+    StringSource(message, true, new PK_EncryptorFilter(rng, encryptor, new StringSink(encrypted)));
+
+    return encrypted;
+    
+}
+
+std::string Compressore::decryptMessageRSA(std::string message) {
+    std::string decrypted;
+    RSAES_OAEP_SHA_Decryptor decryptor(getPrivateKey());
+
+    StringSource(message, true, new PK_DecryptorFilter(rng, decryptor, new StringSink(decrypted)));
+
+    return decrypted;
+
+}
+
+std::string Compressore::signMessageRSA(const std::string& message) {
+    RSASSA_PKCS1v15_SHA_Signer signer(getPrivateKey());
+
+    // Firmare il messaggio
+    std::string signature;
+    StringSource(message, true, new SignerFilter(rng, signer, new StringSink(signature)));
+
+
+    return signature;
+}
+
+// Funzione per verificare la firma di un messaggio
+bool Compressore::verifySignatureRSA(const std::string& message, const std::string& signature, const RSA::PublicKey& signerPublicKey) {
+    RSASSA_PKCS1v15_SHA_Verifier verifier(signerPublicKey);
+
+    // Verificare la firma
+    bool result = false;
+    StringSource(signature + message, true, new SignatureVerificationFilter(verifier, new ArraySink((byte*)&result, sizeof(result))));
+
+
+    return result;
+}
+
 std::string Compressore::checkIndexesString() {
     std::string indexes = "";
     
-    for (int i = 0; i < std::size(shared_info); i++) {
-        if (!(shared_info[i].empty())) {
+    for (int i = 0; i < std::size(sharedInfo); i++) {
+        if (!(sharedInfo[i].empty())) {
             indexes = indexes + std::to_string(i) + ",";
         }
     }
@@ -92,7 +130,7 @@ std::vector<int> Compressore::indexesInCommon(std::string receivedIndexes) {
     std::vector<int> common;
 
     for (int i = 0; i < indexes.size(); i++) {
-        if (i < shared_info->size() && !(shared_info[indexes[i]].empty())) {
+        if (i < sharedInfo->size() && !(sharedInfo[indexes[i]].empty())) {
             common.push_back(indexes[i]);
         }
         
@@ -101,7 +139,7 @@ std::vector<int> Compressore::indexesInCommon(std::string receivedIndexes) {
     return common;
 }
 
-std::string Compressore::permutation(std::vector<int> commonIndexes) {
+std::string Compressore::createPermutation(std::vector<int> commonIndexes) {
     CryptoPP::AutoSeededRandomPool rnd;
     std::string indexPermutation = "";
 
@@ -127,42 +165,20 @@ byte* Compressore::convertToByte(std::string concatenation) {
 }
 
 
-void DeriveKeyWithHKDF(const byte* salt, size_t saltLength,
-    const byte* ikm, size_t ikmLength,
-    const byte* info, size_t infoLength,
-    byte* derivedKey, size_t derivedKeyLength) {
-    HKDF<SHA256> hkdf;
-    hkdf.DeriveKey(derivedKey, derivedKeyLength, ikm, ikmLength, salt, saltLength, info, infoLength);
-}
-
 void Compressore::createSharedKey(std::string permutation) {
     std::vector<int> indexes = tokenizeByComma(permutation);
     std::string concatenation = "";
     for (int i = 0; i < indexes.size(); i++) {
-        concatenation = concatenation + shared_info[indexes[i]];
+        concatenation = concatenation + sharedInfo[indexes[i]];
     }
 
-
-    //const byte* ikm = convertToByte(concatenation);
-
-    
     const byte* ikm = reinterpret_cast<const byte*>(concatenation.data());
-    byte salt[] = { 0x00, 0x01, 0x02, 0x03 }; // Salt (puoi generare casualmente) HASH DELLE COSE CHE DOBBIAMO FA
-    byte info[] = "Additional Info"; // Additional Info
-
-    const size_t saltLength = sizeof(salt);
     const size_t ikmLength = sizeof(ikm) - 1; // -1 per escludere il terminatore null
-    const size_t infoLength = sizeof(info) - 1; // -1 per escludere il terminatore null
-    const size_t derivedKeyLength = 32; // Lunghezza della chiave derivata (in byte)
-   
-
-    DeriveKeyWithHKDF(salt, saltLength, ikm, ikmLength, info, infoLength, sharedKey, derivedKeyLength);
+    hkdf.DeriveKey(sharedKey, derivedKeyLength, ikm, ikmLength, salt, saltLength, info, infoLength);
 
 }
 
-byte* Compressore::getSharedKey() {
-    return sharedKey;
-}
+
 
 
 

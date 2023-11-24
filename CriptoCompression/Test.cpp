@@ -18,42 +18,101 @@
 
 
 int main() {
-	Compressore compressore;
-	Decompressore decompressore;
+	Compressore compressor;
+	Decompressore decompressor;
 	std::queue<std::string> channel;
 	
-	compressore.setChannel(channel);
-	decompressore.setChannel(channel);
+	compressor.setChannel(channel);
+	decompressor.setChannel(channel);
 
 
-	std::string decompressore_indici = decompressore.checkIndexesString();
-	channel.push(decompressore_indici);
+	std::string decompressorIndexes = decompressor.checkIndexesString();
+	std::string encryptedDecompressorIndexes = decompressor.encryptMessageRSA(decompressorIndexes, compressor.getPublicKey());
+	
 
-	std::cout << "Indici del decompressore: " << decompressore_indici << std::endl;
+	std::cout << "Decompressor indexes: " << decompressorIndexes << std::endl;
 
-	std::vector<int> indici_comuni = compressore.indexesInCommon(channel.front());
+	std::string decompressorIndexesSignature = decompressor.signMessageRSA(encryptedDecompressorIndexes);
 
-	std::cout << "Indici in comune: " << std::endl;
+	channel.push(encryptedDecompressorIndexes);
+	channel.push(decompressorIndexesSignature);
 
-	for (int i = 0; i < indici_comuni.size(); i++) {
-		std::cout << indici_comuni[i] << std::endl;
-	}
+	std::cout << "SIGNATURE decompressor indexes: " << decompressorIndexesSignature << std::endl;
 
+	
+	std::string encryptedIndexesByDecompressor = channel.front();
 	channel.pop();
 
-	std::string permutazione_scelta = compressore.permutation(indici_comuni);
-	std::cout << permutazione_scelta << std::endl;
+	std::string encryptedIndexesSignatureByDecompressor = channel.front();
+	channel.pop();
 
-	channel.push(permutazione_scelta);
+	if (!compressor.verifySignatureRSA(encryptedIndexesByDecompressor, encryptedIndexesSignatureByDecompressor, decompressor.getPublicKey())) {
+		std::cout << "MESSAGE NOT AUTHENTICATED!" << std::endl;
+		return 0;
+	}
 
-	compressore.createSharedKey(permutazione_scelta);
-	//decompressore.createSharedKey(permutazione_scelta);
 
-	byte* chiave_compressore = compressore.getSharedKey();
 
-	std::cout << "Derived Key: ";
+	std::string decryptedDecompressorIndexes = compressor.decryptMessageRSA(encryptedDecompressorIndexes);
+
+	std::vector<int> commonIndexes = compressor.indexesInCommon(decryptedDecompressorIndexes);
+
+
+	std::cout << "Common indexes: ";
+
+	for (int i = 0; i < commonIndexes.size(); i++) {
+		std::cout << commonIndexes[i] << ",";
+	}
+	std::cout << std::endl;
+
+
+	std::string choosenPermutation = compressor.createPermutation(commonIndexes);
+	std::cout <<"Choosen permutation: " << choosenPermutation << std::endl;
+
+	std::string encryptedChoosenPermutation = compressor.encryptMessageRSA(choosenPermutation, decompressor.getPublicKey());
+
+	std::cout << "Encrypted choosen permutation: " << encryptedChoosenPermutation << std::endl;
+
+
+	channel.push(encryptedChoosenPermutation);
+
+	std::string encryptedChoosenPermutationSignature = compressor.signMessageRSA(encryptedChoosenPermutation);
+	channel.push(encryptedChoosenPermutationSignature);
+
+	compressor.createSharedKey(choosenPermutation);
+	decompressor.createSharedKey(choosenPermutation);
+
+	std::string encryptedChoosenPermutationByCompressor = channel.front();
+	channel.pop();
+
+	std::string encryptedChoosenPermutationSignatureByCompressor = channel.front();
+	channel.pop();
+
+
+	if (!decompressor.verifySignatureRSA(encryptedChoosenPermutationByCompressor, encryptedChoosenPermutationSignatureByCompressor, compressor.getPublicKey())) {
+		std::cout << "MESSAGE NOT AUTHENTICATED!" << std::endl;
+		return 0;
+	}
+
+	std::string decryptedChoosenPermutation = decompressor.decryptMessageRSA(encryptedChoosenPermutationByCompressor);
+
+	
+
+	std::cout << "Decrypted choosen permutation: " << decryptedChoosenPermutation << std::endl;
+
+	byte* compressorSymKey = compressor.getSharedKey();
+	byte* decompressorSymKey = decompressor.getSharedKey();
+
+	std::cout << "[COMPRESSOR] Derived Key: ";
 	for (size_t i = 0; i < DERIVED_KEY_LENGTH; ++i) {
-		std::cout << std::hex << static_cast<int>(chiave_compressore[i]);
+		std::cout << std::hex << static_cast<int>(compressorSymKey[i]);
+	}
+
+	std::cout << std::endl;
+
+	std::cout << "[DECOMPRESSOR] Derived Key: ";
+	for (size_t i = 0; i < DERIVED_KEY_LENGTH; ++i) {
+		std::cout << std::hex << static_cast<int>(decompressorSymKey[i]);
 	}
 
 	std::cout << std::endl;

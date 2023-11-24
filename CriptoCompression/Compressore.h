@@ -22,25 +22,39 @@ public:
     // Distruttore (opzionale, usato per rilasciare risorse allocate)
     ~Compressore();
 
-    void send(std:: string a);
-    std::string receive(std:: string a);
     void setChannel(std::queue<std:: string> ch);
     RSA::PublicKey getPublicKey();
     RSA::PrivateKey getPrivateKey();
+    byte* getSharedKey();
     std::string checkIndexesString();
     std::vector<int> indexesInCommon(std::string);
-    std::string permutation(std::vector<int>);
+    std::string createPermutation(std::vector<int>);
     void createSharedKey(std::string);
     std::vector<int> tokenizeByComma(std::string);
     byte* convertToByte(std::string);
-    byte* getSharedKey();
+    std::string encryptMessageRSA(std::string, RSA::PublicKey);
+    std::string decryptMessageRSA(std::string);
+    std::string signMessageRSA(const std::string&);
+    bool verifySignatureRSA(const std::string&, const std::string&, const RSA::PublicKey&);
+
+    
 
 private:
     // Attributi privati della classe
-    std::string shared_info[5];
+    AutoSeededRandomPool rng;
+    std::string sharedInfo[5];
     InvertibleRSAFunction params;
+    HKDF<SHA256> hkdf;
     std::queue<std::string> channel;
+
     byte sharedKey[32];
+    byte salt[4] = { 0x00, 0x01, 0x02, 0x03 }; // Salt 
+    byte info[16] = "Additional Info"; // Additional Info
+
+    const size_t saltLength = sizeof(salt);
+    const size_t infoLength = sizeof(info) - 1; // -1 per escludere il terminatore null
+    const size_t derivedKeyLength = 32; // Lunghezza della chiave derivata (in byte)
+    
 };
 
 #endif  // MYCLASS_H
