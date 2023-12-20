@@ -11,7 +11,7 @@
 #include <string>
 
 
-#define DERIVED_KEY_LENGTH 32
+#define DERIVED_KEY_LENGTH 256
 
 
 
