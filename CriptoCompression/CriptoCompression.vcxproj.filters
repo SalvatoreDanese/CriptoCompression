@@ -33,6 +33,12 @@
     <ClCompile Include="Decompressore.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Huffman.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Compressore.h">
@@ -41,5 +47,13 @@
     <ClInclude Include="Decompressore.h">
       <Filter>File di origine</Filter>
     </ClInclude>
+    <ClInclude Include="Huffman.h">
+      <Filter>File di origine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\Tesi\bible.txt">
+      <Filter>File di origine</Filter>
+    </Text>
   </ItemGroup>
 </Project>

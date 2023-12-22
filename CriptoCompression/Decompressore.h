@@ -42,13 +42,13 @@ private:
     HKDF<SHA256> hkdf;
     std::queue<std::string> channel;
 
-    byte sharedKey[32];
+    byte sharedKey[256];
     byte salt[4] = { 0x00, 0x01, 0x02, 0x03 }; // Salt 
     byte info[16] = "Additional Info"; // Additional Info
 
     const size_t saltLength = sizeof(salt);
     const size_t infoLength = sizeof(info) - 1; // -1 per escludere il terminatore null
-    const size_t derivedKeyLength = 32; // Lunghezza della chiave derivata (in byte)
+    const size_t derivedKeyLength = 256; // Lunghezza della chiave derivata (in byte)
 };
 
 #endif  // MYCLASS_H

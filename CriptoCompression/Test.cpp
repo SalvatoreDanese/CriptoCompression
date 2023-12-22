@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Compressore.h"
 #include "Decompressore.h"
+#include "Huffman.h"
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/rsa.h>
 #include <cryptopp/sha.h>
@@ -9,15 +10,18 @@
 #include <cryptopp/files.h>
 #include <queue>
 #include <string>
+#include <bitset>
 
 
-#define DERIVED_KEY_LENGTH 32
+#define DERIVED_KEY_LENGTH 256
 
 
 
 void printMessage(std::string message, std::string sender) {
 	std::cout << "[" << sender << "] " << message << std::endl << std::endl;
 }
+
+
 
 
 int main() {
@@ -124,6 +128,23 @@ int main() {
 	}
 
 	std::cout << std::endl;
+
+
+	// Converti l'array di byte in una stringa binaria
+	std::string binaryString = "";
+	for (int i = 0; i <DERIVED_KEY_LENGTH; ++i) {
+		binaryString += std::bitset<8>(compressorSymKey[i]).to_string();
+	}
+
+	// Stampa la stringa binaria risultante
+	std::cout << "Stringa binaria risultante: " << binaryString << std::endl;
+
+
+	Huffman h(binaryString);
+	
+	h.huffmanEncode("bible", ".txt", 2, 200);
+	
+	h.huffmanDecode("bible",binaryString);
 
 	return 0;
 
