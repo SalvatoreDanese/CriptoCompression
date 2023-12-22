@@ -104,6 +104,7 @@ int main() {
 	std::cout << std::endl << "**************************" << std::endl << "PLAINTEXT DATA FLOW: " << std::endl << std::endl;
 
 	
+
 	printMessage("Decompressor indexes: " + decompressorIndexes, "DECOMPRESSOR");
 
 	std::cout << "COMMON INDEXES: ";
