@@ -143,16 +143,16 @@ std::vector<int> Compressore::indexesInCommon(std::string receivedIndexes) {
     return common;
 }
 
-std::string Compressore::createPermutation(std::vector<int> commonIndexes) {
+std::string Compressore::createDisposition(std::vector<int> commonIndexes) {
     CryptoPP::AutoSeededRandomPool rnd;
-    std::string indexPermutation = "";
+    std::string indexDisposition = "";
 
     for (int i = 0; i < 20; i++) {
         int rand = rnd.GenerateWord32(0, commonIndexes.size() - 1);
-        indexPermutation = indexPermutation + std::to_string(commonIndexes[rand]) + ",";
+        indexDisposition = indexDisposition + std::to_string(commonIndexes[rand]) + ",";
     }
 
-    return indexPermutation;
+    return indexDisposition;
 }
 
 byte* Compressore::convertToByte(std::string concatenation) {
@@ -178,8 +178,8 @@ std::string Compressore::calculateHash(std::string& input) {
 }
 
 
-void Compressore::createSharedKey(std::string permutation) {
-    std::vector<int> indexes = tokenizeByComma(permutation);
+void Compressore::createSharedKey(std::string disposition) {
+    std::vector<int> indexes = tokenizeByComma(disposition);
     std::string concatenation = "";
     for (int i = 0; i < indexes.size(); i++) {
         concatenation = concatenation + sharedInfo[indexes[i]];

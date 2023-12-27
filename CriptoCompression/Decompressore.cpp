@@ -135,8 +135,8 @@ std::string Decompressore::calculateHash(std::string& input) {
 }
 
 
-void Decompressore::createSharedKey(std::string permutation) {
-    std::vector<int> indexes = tokenizeByComma(permutation);
+void Decompressore::createSharedKey(std::string disposition) {
+    std::vector<int> indexes = tokenizeByComma(disposition);
     std::string concatenation = "";
     for (int i = 0; i < indexes.size(); i++) {
         concatenation = concatenation + sharedInfo[indexes[i]];

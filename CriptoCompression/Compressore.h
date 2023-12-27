@@ -29,7 +29,7 @@ public:
     byte* getSharedKey();
     std::string checkIndexesString();
     std::vector<int> indexesInCommon(std::string);
-    std::string createPermutation(std::vector<int>);
+    std::string createDisposition(std::vector<int>);
     void createSharedKey(std::string);
     std::vector<int> tokenizeByComma(std::string);
     byte* convertToByte(std::string);

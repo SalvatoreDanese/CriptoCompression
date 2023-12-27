@@ -67,35 +67,35 @@ int main() {
 
 	std::vector<int> commonIndexes = compressor.indexesInCommon(decryptedDecompressorIndexes);
 
-	std::string choosenPermutation = compressor.createPermutation(commonIndexes);
+	std::string choosenDisposition = compressor.createDisposition(commonIndexes);
 
-	std::string encryptedChoosenPermutation = compressor.encryptMessageRSA(choosenPermutation, decompressor.getPublicKey());
+	std::string encryptedChoosenDisposition = compressor.encryptMessageRSA(choosenDisposition, decompressor.getPublicKey());
 
-	channel.push(encryptedChoosenPermutation);
+	channel.push(encryptedChoosenDisposition);
 
-	std::string encryptedChoosenPermutationSignature = compressor.signMessageRSA(encryptedChoosenPermutation);
-	channel.push(encryptedChoosenPermutationSignature);
+	std::string encryptedChoosenDispositionSignature = compressor.signMessageRSA(encryptedChoosenDisposition);
+	channel.push(encryptedChoosenDispositionSignature);
 
-	printMessage("ENCRYPTED CHOOSEN PERMUTATION INDEXES:\n" + encryptedChoosenPermutation, "COMPRESSOR");
-	printMessage("ENCRYPTED CHOOSEN PERMUTATION INDEXES SIGNATURE:\n" + encryptedChoosenPermutationSignature, "COMPRESSOR");
+	printMessage("ENCRYPTED CHOOSEN DISPOSITION INDEXES:\n" + encryptedChoosenDisposition, "COMPRESSOR");
+	printMessage("ENCRYPTED CHOOSEN DISPOSITION INDEXES SIGNATURE:\n" + encryptedChoosenDispositionSignature, "COMPRESSOR");
 	std::cout << std::endl << "END CHANNEL TRANSCRIPT: " << std::endl << "**************************"  <<  std::endl;
 
-	std::string encryptedChoosenPermutationByCompressor = channel.front();
+	std::string encryptedChoosenDispositionByCompressor = channel.front();
 	channel.pop();
 
-	std::string encryptedChoosenPermutationSignatureByCompressor = channel.front();
+	std::string encryptedChoosenDispositionSignatureByCompressor = channel.front();
 	channel.pop();
 
 
-	if (!decompressor.verifySignatureRSA(encryptedChoosenPermutationByCompressor, encryptedChoosenPermutationSignatureByCompressor, compressor.getPublicKey())) {
+	if (!decompressor.verifySignatureRSA(encryptedChoosenDispositionByCompressor, encryptedChoosenDispositionSignatureByCompressor, compressor.getPublicKey())) {
 		std::cout << "MESSAGE NOT AUTHENTICATED!" << std::endl;
 		return 0;
 	}
 
-	std::string decryptedChoosenPermutation = decompressor.decryptMessageRSA(encryptedChoosenPermutationByCompressor);
+	std::string decryptedChoosenDisposition = decompressor.decryptMessageRSA(encryptedChoosenDispositionByCompressor);
 
-	compressor.createSharedKey(choosenPermutation);
-	decompressor.createSharedKey(decryptedChoosenPermutation);
+	compressor.createSharedKey(choosenDisposition);
+	decompressor.createSharedKey(decryptedChoosenDisposition);
 
 	byte* compressorSymKey = compressor.getSharedKey();
 	byte* decompressorSymKey = decompressor.getSharedKey();
@@ -118,8 +118,8 @@ int main() {
 		return -1;
 	}
 
-	printMessage("Choosen permutation:\n" + choosenPermutation, "COMPRESSOR");
-	printMessage("Decrypted choosen permutation: " + decryptedChoosenPermutation, "DECOMPRESSOR");
+	printMessage("Choosen disposition:\n" + choosenDisposition, "COMPRESSOR");
+	printMessage("Decrypted choosen disposition: " + decryptedChoosenDisposition, "DECOMPRESSOR");
 
 	std::cout << "[COMPRESSOR] Derived Key: ";
 	for (size_t i = 0; i < DERIVED_KEY_LENGTH; ++i) {
