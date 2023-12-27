@@ -21,7 +21,11 @@ Decompressore::Decompressore() {
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);
     sharedInfo[0] = "ciao";
+    sharedInfo[1] = "ok";
+    sharedInfo[2] = "ciao";
     sharedInfo[3] = "ok";
+    sharedInfo[4] = "ciao";
+    sharedInfo[5] = "ok";
 }
 
 // Implementazione del distruttore

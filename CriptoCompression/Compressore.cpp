@@ -23,7 +23,11 @@ Compressore::Compressore() {
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);
     sharedInfo[0] = "ciao";
+    sharedInfo[1] = "ok";
+    sharedInfo[2] = "ciao";
     sharedInfo[3] = "ok";
+    sharedInfo[4] = "ciao";
+    sharedInfo[5] = "ok";
 
 }
 
@@ -130,12 +134,12 @@ std::vector<int> Compressore::indexesInCommon(std::string receivedIndexes) {
     std::vector<int> common;
 
     for (int i = 0; i < indexes.size(); i++) {
-        if (i < sharedInfo->size() && !(sharedInfo[indexes[i]].empty())) {
+        if (i < MAX_SHARED_KNOWLEDGE && !(sharedInfo[indexes[i]].empty())) {
             common.push_back(indexes[i]);
         }
         
     }
-
+    
     return common;
 }
 

@@ -8,6 +8,8 @@
 #include <cryptopp/osrng.h>
 #include <queue>
 
+#define MAX_SHARED_KNOWLEDGE 20
+
 using namespace CryptoPP;
 
 class Decompressore {
@@ -37,7 +39,7 @@ private:
     // Attributi privati della classe
 
     AutoSeededRandomPool rng;
-    std::string sharedInfo[5];
+    std::string sharedInfo[MAX_SHARED_KNOWLEDGE];
     InvertibleRSAFunction params;
     HKDF<SHA256> hkdf;
     std::queue<std::string> channel;

@@ -113,6 +113,11 @@ int main() {
 	}
 	std::cout << std::endl << std::endl;
 
+	if (commonIndexes.size() < 5) {
+		std::cout << "ERRORE NON CI SONO PIU DI 5 ELEMENTI IN COMUNE";
+		return -1;
+	}
+
 	printMessage("Choosen permutation:\n" + choosenPermutation, "COMPRESSOR");
 	printMessage("Decrypted choosen permutation: " + decryptedChoosenPermutation, "DECOMPRESSOR");
 
@@ -143,7 +148,7 @@ int main() {
 
 	Huffman h(binaryString);
 	
-	h.huffmanEncode("bible", ".txt", 2, 200);
+	h.huffmanEncode("bible", ".txt", 2, 400);
 	
 	h.huffmanDecode("bible",binaryString);
 
