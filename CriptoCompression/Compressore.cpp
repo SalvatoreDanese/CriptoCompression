@@ -22,12 +22,14 @@ Compressore::Compressore() {
     params.GenerateRandomWithKeySize(rng, 2048);
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);
-    sharedInfo[0] = "ciao";
-    sharedInfo[1] = "ok";
-    sharedInfo[2] = "ciao";
-    sharedInfo[3] = "ok";
-    sharedInfo[4] = "ciao";
-    sharedInfo[5] = "ok";
+    sharedInfo[0] = "b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2";
+    sharedInfo[1] = "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df";
+    sharedInfo[2] = "8cf2283ad6ef0a3266059b418a73f8479338233ea2c4bcd3c1f51c39f13ae7dc";
+    sharedInfo[3] = "3e2ef76298b12530001eb4edc4cfd0a1662ba83b78092ea2b4721fa3fd94e38a";
+    sharedInfo[4] = "a193bc1f827a4c189ebc8c3278e5b333041670356c391600ceb0373c2a8ec4a1";
+    sharedInfo[5] = "f520ee29dcf7bb944bedab63e1a1d4f251fb2290e54e0c0ddbf28e7c148bb6f8";
+    sharedInfo[6] = "a193bc1f827a4c189ebc8c3278e5b333041670356c391600ceb0373c2a8ec3a1";
+    sharedInfo[7] = "f520ee29dcf7bb944bedab63e1a1d4f251fb2290e54e0c0ddbf28e7c148bb6d8";
 
 }
 
