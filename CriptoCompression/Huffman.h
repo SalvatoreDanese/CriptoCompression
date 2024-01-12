@@ -112,7 +112,7 @@ public:
 
 	void huffmanEncode(string filename, string extension, int transformationMethod, int numDC);	//Effettua codifica di Huffman
 
-	void huffmanDecode(string filename, string key);	//Effettua la decodifica e salva il testo decodificato come una stringa nel file <nomefile> decoded.txt
+	void huffmanDecode(string filename, string key);	//Effettua la decodifica e salva il testo decodificato come una stringa nel file <nomefile> decoded.txt. Nella versione reale il file dovrà essere salvato nella directory della conoscenza locale, in modo tale da incrementare la conoscenza comune
 
 };
 

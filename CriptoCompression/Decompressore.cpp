@@ -12,6 +12,11 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/secblock.h>
 #include "cryptopp/hex.h"
+#include <fstream>
+#include <sstream>
+#include <experimental/filesystem>
+
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 
 // Implementazione del costruttore
 Decompressore::Decompressore() {
@@ -20,15 +25,6 @@ Decompressore::Decompressore() {
     params.GenerateRandomWithKeySize(rng, 2048);
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);
-    sharedInfo[0] = "b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2";
-    sharedInfo[1] = "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df";
-    sharedInfo[2] = "8cf2283ad6ef0a3266059b418a73f8479338233ea2c4bcd3c1f51c39f13ae7dc";
-    sharedInfo[3] = "3e2ef76298b12530001eb4edc4cfd0a1662ba83b78092ea2b4721fa3fd94e38a";
-    sharedInfo[4] = "a193bc1f827a4c189ebc8c3278e5b333041670356c391600ceb0373c2a8ec4a1";
-    sharedInfo[5] = "f520ee29dcf7bb944bedab63e1a1d4f251fb2290e54e0c0ddbf28e7c148bb6f8";
-    sharedInfo[9] = "a193bc1f827a4c189ebc8c3278e5b333041670356c391600ceb0373c2a8ec3a2";
-    sharedInfo[10] = "f520ee29dcf7bb944bedab63e1a1d4f251fb2290e54e0c0ddbf28e7c148bb6dh";
-    sharedInfo[11] = "14a7c525b11fb24f33a1e457efe3c13329a8a00ea46e9006a9edfcfef193014a";
 }
 
 // Implementazione del distruttore
@@ -100,7 +96,9 @@ bool Decompressore::verifySignatureRSA(const std::string& message, const std::st
 
 std::string Decompressore::checkIndexesString() {
     std::string indexes = "";
+    
     for (int i = 0; i < std::size(sharedInfo); i++) {
+       
         if (!(sharedInfo[i].empty())) {
             indexes = indexes + std::to_string(i) + ",";
         }
@@ -139,6 +137,8 @@ std::string Decompressore::calculateHash(std::string& input) {
 
 
 void Decompressore::createSharedKey(std::string disposition) {
+
+
     std::vector<int> indexes = tokenizeByComma(disposition);
     std::string concatenation = "";
     for (int i = 0; i < indexes.size(); i++) {
@@ -152,3 +152,67 @@ void Decompressore::createSharedKey(std::string disposition) {
 
 }
 
+unsigned int Decompressore::rabin_fingerprint(std::string& text, unsigned int prime) {
+    unsigned int result = 0;
+    for (char c : text) {
+        result = (result * 256 + static_cast<unsigned int>(c)) % prime;
+    }
+    return result;
+}
+
+void Decompressore::calculateSharedInfo() {
+
+
+    std::string directory_path = "DecompressorFiles";
+
+
+    try {
+        for (const auto& entry : std::experimental::filesystem::directory_iterator(directory_path)) {
+            if (std::experimental::filesystem::is_regular_file(entry.path())) {
+                std::ifstream inputFile(entry.path());
+                std::string inputString, encodedString;
+                std::stringstream buf;
+                buf << inputFile.rdbuf();
+                inputString = buf.str();
+
+                int key = rabin_fingerprint(inputString);
+                std::string value = calculateHash(inputString);
+                sharedInfo[key] = value;
+                inputFile.close();
+            }
+        }
+    }
+    catch (const std::experimental::filesystem::filesystem_error& ex) {
+        std::cerr << "Errore durante la lettura della directory: " << ex.what() << std::endl;
+    }
+
+    std::ifstream inputFile();
+}
+
+void Decompressore::addSharedInfo(int key, std::string value) {
+    sharedInfo[key] = value;
+}
+
+void Decompressore::processMessage(std::string message) {
+    if(message.substr(0,4) == "SYNC") {
+        std::string delimiter = ":";
+
+        size_t pos = 0;
+        std::string token;
+
+        std::vector<int> common;
+
+        std::string synch = message.substr(7, message.size() - 7);
+        pos = synch.find(delimiter);
+        token = synch.substr(0, pos);
+        int key = std::stoi(token);
+        std::string value = synch.substr(pos + 1, synch.size() - pos);
+
+        addSharedInfo(key, value);
+
+    }
+
+    else {
+        createSharedKey(message);
+    }
+}

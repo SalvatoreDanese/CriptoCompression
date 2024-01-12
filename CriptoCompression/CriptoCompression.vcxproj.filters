@@ -15,18 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CriptoCompression.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="hkdf.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="rsaTest.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="signature.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Compressore.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -49,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="Huffman.h">
       <Filter>File di origine</Filter>
+    </ClInclude>
+    <ClInclude Include="Test.h">
+      <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

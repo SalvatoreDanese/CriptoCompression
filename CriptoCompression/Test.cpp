@@ -32,6 +32,10 @@ int main() {
 	compressor.setChannel(channel);
 	decompressor.setChannel(channel);
 
+	compressor.calculateSharedInfo();
+	decompressor.calculateSharedInfo();
+	
+
 	std::cout << "**************************" << std::endl << "CHANNEL TRANSCRIPT: " << std::endl << std::endl;
 
 
@@ -62,10 +66,53 @@ int main() {
 	}
 
 
-
 	std::string decryptedDecompressorIndexes = compressor.decryptMessageRSA(encryptedDecompressorIndexes);
 
 	std::vector<int> commonIndexes = compressor.indexesInCommon(decryptedDecompressorIndexes);
+	int remaining;
+	std::unordered_map<int, std::string> missingIndexes;
+
+	if (commonIndexes.size() < 5) {
+		
+		remaining = 5 - commonIndexes.size();
+
+		missingIndexes = compressor.chooseIndexes(remaining, commonIndexes);
+
+		for (int i = 0; i < missingIndexes.size(); i++) {
+			if (!missingIndexes[i].empty()) {
+				std::string encryptedMissingInfo = compressor.encryptMessageRSA("SYNC - " + std::to_string(i) + ":" + missingIndexes[i], decompressor.getPublicKey());
+				std::string encryptedMissingInfoSignature = compressor.signMessageRSA(encryptedMissingInfo);
+
+				channel.push(encryptedMissingInfo);
+				channel.push(encryptedMissingInfoSignature);
+
+				printMessage("ENCRYPTED SYNCH: \n" + encryptedMissingInfo, "COMPRESSOR");
+				printMessage("ENCRYPTED SYNCH SIGNATURE: \n" + encryptedMissingInfo, "COMPRESSOR");
+
+
+				std::string encryptedSynch = channel.front();
+				channel.pop();
+
+				std::string encryptedSynchSignature = channel.front();
+				channel.pop();
+
+				if (!decompressor.verifySignatureRSA(encryptedSynch, encryptedSynchSignature, compressor.getPublicKey())) {
+					std::cout << "MESSAGE NOT AUTHENTICATED!" << std::endl;
+					return 0;
+				}
+				std::string decryptedSynch = decompressor.decryptMessageRSA(encryptedSynch);
+
+				decompressor.processMessage(decryptedSynch);
+				
+			}
+			
+		}
+
+		//SYNC --- fing1 -> hash1 ...
+		//DISPOSITION OF FING...
+	
+	}
+
 
 	std::string choosenDisposition = compressor.createDisposition(commonIndexes);
 
@@ -95,7 +142,7 @@ int main() {
 	std::string decryptedChoosenDisposition = decompressor.decryptMessageRSA(encryptedChoosenDispositionByCompressor);
 
 	compressor.createSharedKey(choosenDisposition);
-	decompressor.createSharedKey(decryptedChoosenDisposition);
+	decompressor.processMessage(decryptedChoosenDisposition);
 
 	byte* compressorSymKey = compressor.getSharedKey();
 	byte* decompressorSymKey = decompressor.getSharedKey();
@@ -112,11 +159,6 @@ int main() {
 		std::cout << commonIndexes[i] << ",";
 	}
 	std::cout << std::endl << std::endl;
-
-	if (commonIndexes.size() < 5) {
-		std::cout << "ERRORE NON CI SONO PIU DI 5 ELEMENTI IN COMUNE";
-		return -1;
-	}
 
 	printMessage("Choosen disposition:\n" + choosenDisposition, "COMPRESSOR");
 	printMessage("Decrypted choosen disposition: " + decryptedChoosenDisposition, "DECOMPRESSOR");
@@ -150,7 +192,12 @@ int main() {
 	
 	h.huffmanEncode("bible", ".txt", 2, 400);
 	
-	h.huffmanDecode("bible",binaryString);
+	std::string dbinaryString = "";
+	for (int i = 0; i < DERIVED_KEY_LENGTH; ++i) {
+		dbinaryString += std::bitset<8>(decompressorSymKey[i]).to_string();
+	}
+
+	h.huffmanDecode("bible",dbinaryString);
 
 	return 0;
 

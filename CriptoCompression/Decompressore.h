@@ -7,6 +7,7 @@
 #include <cryptopp/rsa.h>
 #include <cryptopp/osrng.h>
 #include <queue>
+#include <unordered_map>
 
 #define MAX_SHARED_KNOWLEDGE 20
 
@@ -34,12 +35,16 @@ public:
     std::string signMessageRSA(const std::string&);
     bool verifySignatureRSA(const std::string& , const std::string& , const RSA::PublicKey&);
     std::string calculateHash(std::string&);
+    unsigned int rabin_fingerprint(std::string& text, unsigned int prime = 683303);
+    void calculateSharedInfo();
+    void addSharedInfo(int i, std::string);
+    void processMessage(std::string);
 
 private:
     // Attributi privati della classe
 
     AutoSeededRandomPool rng;
-    std::string sharedInfo[MAX_SHARED_KNOWLEDGE];
+    std::unordered_map<int, std::string> sharedInfo;
     InvertibleRSAFunction params;
     HKDF<SHA256> hkdf;
     std::queue<std::string> channel;

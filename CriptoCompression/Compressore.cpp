@@ -11,6 +11,11 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/secblock.h>
 #include "cryptopp/hex.h"
+#include <fstream>
+#include <sstream>
+#include <experimental/filesystem>
+
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 
 using namespace CryptoPP;
 
@@ -22,14 +27,6 @@ Compressore::Compressore() {
     params.GenerateRandomWithKeySize(rng, 2048);
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);
-    sharedInfo[0] = "b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2";
-    sharedInfo[1] = "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df";
-    sharedInfo[2] = "8cf2283ad6ef0a3266059b418a73f8479338233ea2c4bcd3c1f51c39f13ae7dc";
-    sharedInfo[3] = "3e2ef76298b12530001eb4edc4cfd0a1662ba83b78092ea2b4721fa3fd94e38a";
-    sharedInfo[4] = "a193bc1f827a4c189ebc8c3278e5b333041670356c391600ceb0373c2a8ec4a1";
-    sharedInfo[5] = "f520ee29dcf7bb944bedab63e1a1d4f251fb2290e54e0c0ddbf28e7c148bb6f8";
-    sharedInfo[6] = "a193bc1f827a4c189ebc8c3278e5b333041670356c391600ceb0373c2a8ec3a1";
-    sharedInfo[7] = "f520ee29dcf7bb944bedab63e1a1d4f251fb2290e54e0c0ddbf28e7c148bb6d8";
 
 }
 
@@ -195,3 +192,65 @@ void Compressore::createSharedKey(std::string disposition) {
 
 }
 
+unsigned int Compressore::rabin_fingerprint(std::string& text, unsigned int prime) {
+    unsigned int result = 0;
+    for (char c : text) {
+        result = (result * 256 + static_cast<unsigned int>(c)) % prime;
+    }
+    return result;
+}
+
+void Compressore::calculateSharedInfo() {
+    
+    std::string directory_path = "CompressorFiles";
+    
+
+    try {
+        for (const auto& entry : std::experimental::filesystem::directory_iterator(directory_path)) {
+            if (std::experimental::filesystem::is_regular_file(entry.path())) {
+                std::ifstream inputFile(entry.path());
+                std::string inputString, encodedString;
+                std::stringstream buf;
+                buf << inputFile.rdbuf();
+                inputString = buf.str();
+
+                int key = rabin_fingerprint(inputString);
+                std::string value = calculateHash(inputString);
+                sharedInfo[key] = value;
+                inputFile.close();
+                
+            }
+        }
+    }
+    catch (const std::experimental::filesystem::filesystem_error& ex) {
+        std::cerr << "Errore durante la lettura della directory: " << ex.what() << std::endl;
+    }
+
+    std::ifstream inputFile();
+}
+
+std::unordered_map<int, std::string> Compressore::chooseIndexes(int remaining, std::vector<int> &commonIndexes) {
+   
+    std::vector<int> missingIndexes;
+    std::unordered_map<int, std::string> choosenIndexes;
+
+    for (int i = 0; i < std::size(sharedInfo); i++) {
+        if (!(sharedInfo[i].empty()) && std::find(commonIndexes.begin(), commonIndexes.end(), i) == commonIndexes.end()) {
+            missingIndexes.push_back(i);
+        }
+    }
+
+    CryptoPP::AutoSeededRandomPool rnd;
+
+
+
+    for (int i = 0; i < remaining; i++) {
+        int rand = rnd.GenerateWord32(0, missingIndexes.size() - 1);
+        choosenIndexes[missingIndexes[rand]] = sharedInfo[missingIndexes[rand]];
+        commonIndexes.push_back(missingIndexes[rand]);
+        missingIndexes.erase(missingIndexes.begin() + rand);
+    }
+
+    return choosenIndexes;
+
+}
